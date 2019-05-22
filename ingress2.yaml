@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami-deploy
+  labels:
+    app: whoami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+        env: production
+    spec:
+      containers:
+      - name: whoami
+        image: nginx
+        ports:
+        - containerPort: 8000
+     
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1beta1
+metadata:
+  name: whoami-ingress
+spec:
+  tls:
+  - hosts:
+    - whoami.example.com
+    secretName: whoami-secret
+  rules:
+  - host: whoami.example.com
+    http:
+      paths:
+      - path: /whoami1
+        backend:
+          serviceName: whoami-svc1
+          servicePort: 80
+      - path: /whoami2
+        backend:
+          serviceName: whoami-svc2
+          servicePort: 80
